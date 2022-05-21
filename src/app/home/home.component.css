@@ -1,0 +1,23 @@
+.homepage-content {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    background-color: #cef9ffa1;
+}
+
+.homepage-content-row {
+    display: flex;
+    width: 60%;
+    justify-content: space-evenly;
+}
+
+.example-card {
+    max-width: 300px;
+    max-height: 250px;
+}
+
+img {
+    width: 330px;
+    height: 220px;
+}

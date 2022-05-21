@@ -1,4 +1,4 @@
-import { Coords2D } from "../coords2-d";
+import { Coords2D } from "../../model/coords2-d";
 
 export class Snake {
 
