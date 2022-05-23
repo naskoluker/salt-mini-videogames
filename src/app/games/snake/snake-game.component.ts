@@ -5,8 +5,8 @@ import {
   OnInit,
   ViewChild,
   Renderer2 } from '@angular/core';
+import { BiDimensionalCoords } from '../model/bi-dimensional-coords';
 import { Snake } from './model/snake.model';
-import { Coords2D } from '../model/coords2-d';
 
 @Component({
   selector: 'app-snake-game',
@@ -17,11 +17,14 @@ export class SnakeGameComponent implements OnInit, OnDestroy {
 
   @ViewChild('canvasSnake', { static: true }) canvas: ElementRef<HTMLCanvasElement>;
 
-  snake: Snake;
-  gridSize = 20;
-  apple: Coords2D;
   ctx: CanvasRenderingContext2D;
+  canvasSize = 600;
+  gridSize: number = 30;
   interval: any;
+
+  snake: Snake;
+  apple: BiDimensionalCoords;
+  objectSize: number = this.canvasSize / this.gridSize;
 
   constructor(
     private renderer: Renderer2
@@ -33,7 +36,6 @@ export class SnakeGameComponent implements OnInit, OnDestroy {
     this.generateNewApple();
     this.ctx = this.canvas.nativeElement.getContext('2d');
     this.renderer.listen('document', 'keydown', (evt) => {this.keyPush(evt)});
-    this.game();
     this.interval = setInterval(() => {
       this.game();
     }, 1000/15);
@@ -57,12 +59,12 @@ export class SnakeGameComponent implements OnInit, OnDestroy {
 
   drawSnake() {
     this.ctx.fillStyle = "lime";
-    for (var i = 0; i < this.snake.trail.length; i++) {
+    for (let i = 0; i < this.snake.trail.length; i++) {
       this.ctx.fillRect(
-        this.snake.trail[i].x * this.gridSize,
-        this.snake.trail[i].y * this.gridSize,
-        this.gridSize - 1,
-        this.gridSize - 1);
+        this.snake.trail[i].x * this.objectSize,
+        this.snake.trail[i].y * this.objectSize,
+        this.objectSize - 1,
+        this.objectSize - 1);
       if (this.snake.trail[i].x == this.snake.head.x && this.snake.trail[i].y == this.snake.head.y) {
         this.snake.tail = 5;
       }
@@ -76,7 +78,7 @@ export class SnakeGameComponent implements OnInit, OnDestroy {
 
   drawBackground() {
     this.ctx.fillStyle = "black";
-    this.ctx.fillRect(0, 0, 400, 400);
+    this.ctx.fillRect(0, 0, this.canvasSize, this.canvasSize);
   }
 
   eatApple() {
@@ -95,7 +97,7 @@ export class SnakeGameComponent implements OnInit, OnDestroy {
   private drawApple() {
     this.ctx.fillStyle = "red";
     this.ctx.beginPath();
-    this.ctx.arc(this.apple.x * this.gridSize + this.gridSize/2, this.apple.y * this.gridSize + this.gridSize/2, this.gridSize/2, 0, 2 * Math.PI);
+    this.ctx.arc(this.apple.x * this.objectSize + this.objectSize/2, this.apple.y * this.objectSize + this.objectSize/2, this.objectSize/2, 0, 2 * Math.PI);
     this.ctx.fill();
   }
 

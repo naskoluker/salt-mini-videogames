@@ -1,17 +1,17 @@
-import { Coords2D } from "../../model/coords2-d";
+import { BiDimensionalCoords } from "../../model/bi-dimensional-coords";
 
 export class Snake {
 
-    head: Coords2D;
+    head: BiDimensionalCoords;
     tail: number;
-    trail: Array<Coords2D>;
+    trail: Array<BiDimensionalCoords>;
     xv:  number;
     yv:  number;
 
     constructor(
-        head: Coords2D,
+        head: BiDimensionalCoords,
         tail: number,
-        trail: Array<Coords2D>,
+        trail: Array<BiDimensionalCoords>,
         xv:  number,
         yv:  number
     ) {

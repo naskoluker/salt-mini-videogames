@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
-import { AppComponent } from './app.component';
-import { SnakeGameComponent } from './snake/snake-game.component';
+import { SnakeGameComponent } from './games/snake/snake-game.component';
 import { HomeComponent } from './home/home.component';
 
 const routes: Routes = [
