@@ -5,8 +5,8 @@ import {
   OnInit,
   ViewChild,
   Renderer2 } from '@angular/core';
-import { BiDimensionalCoords } from '../model/bi-dimensional-coords';
-import { Snake } from './model/snake.model';
+import { BiDimensionalCoords } from '../model/general-2d-game.model';
+import { Snake } from './snake';
 
 @Component({
   selector: 'app-snake-game',
@@ -31,14 +31,13 @@ export class SnakeGameComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.snake = new Snake({ x: 10, y: 10 }, 5, [], 0, 0);
-    this.apple = { x: 0, y: 0 };
+    this.snake = new Snake();
     this.generateNewApple();
     this.ctx = this.canvas.nativeElement.getContext('2d');
-    this.renderer.listen('document', 'keydown', (evt) => {this.keyPush(evt)});
+    this.renderer.listen('document', 'keydown', (evt) => this.keyPush(evt));
     this.interval = setInterval(() => {
       this.game();
-    }, 1000/15);
+    }, 1000/12);
   }
 
   ngOnDestroy(): void {
@@ -48,31 +47,30 @@ export class SnakeGameComponent implements OnInit, OnDestroy {
   }
 
   game() {
-    this.snake.move(this.gridSize);
-    this.drawBackground();
-    this.drawSnake();
-    if (this.apple.x == this.snake.head.x && this.apple.y == this.snake.head.y) {
-      this.eatApple();
+    const alive = this.snake.move(this.gridSize);
+    if (alive) {
+      if (this.apple.x == this.snake.head.x && this.apple.y == this.snake.head.y) {
+        this.eatApple();
+      } else if (this.snake.tail < this.snake.trail.length) {
+        this.snake.trail.shift();
+      }
+    } else {
+      this.snake = new Snake();
+      this.generateNewApple();
     }
+    this.drawBackground();
     this.drawApple();
+    this.drawSnake();
   }
 
   drawSnake() {
-    this.ctx.fillStyle = "lime";
+    this.ctx.fillStyle = "MediumSpringGreen";
     for (let i = 0; i < this.snake.trail.length; i++) {
       this.ctx.fillRect(
         this.snake.trail[i].x * this.objectSize,
         this.snake.trail[i].y * this.objectSize,
         this.objectSize - 1,
         this.objectSize - 1);
-      if (this.snake.trail[i].x == this.snake.head.x && this.snake.trail[i].y == this.snake.head.y) {
-        this.snake.tail = 5;
-      }
-    }
-
-    this.snake.trail.push({ x: this.snake.head.x, y: this.snake.head.y });
-    while(this.snake.trail.length > this.snake.tail) {
-      this.snake.trail.shift();
     }
   }
 
@@ -87,34 +85,29 @@ export class SnakeGameComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Generates the new coordinates for the apple.
+   * Generates a new apple with random coordinates.
    */
   generateNewApple() {
-    this.apple.x = Math.floor(Math.random() * this.gridSize);
-    this.apple.y = Math.floor(Math.random() * this.gridSize);
+    this.apple = {
+      x: Math.floor(Math.random() * this.gridSize),
+      y: Math.floor(Math.random() * this.gridSize)
+    }
   }
 
   private drawApple() {
-    this.ctx.fillStyle = "red";
+    this.ctx.fillStyle = "OrangeRed";
     this.ctx.beginPath();
-    this.ctx.arc(this.apple.x * this.objectSize + this.objectSize/2, this.apple.y * this.objectSize + this.objectSize/2, this.objectSize/2, 0, 2 * Math.PI);
+    this.ctx.arc(
+      this.apple.x * this.objectSize + this.objectSize/2,
+      this.apple.y * this.objectSize + this.objectSize/2,
+      this.objectSize/2,
+      0,
+      2 * Math.PI
+    );
     this.ctx.fill();
   }
 
   keyPush(evt: any) {
-    switch(evt.keyCode) {
-      case 37: // left
-        this.snake.left();
-        break;
-      case 38: // up
-        this.snake.up();
-        break;
-      case 39: // right
-        this.snake.right();
-        break;
-      case 40: // down
-        this.snake.down();
-        break;
-    }
+    this.snake.changeDirection(evt.keyCode);
   }
 }
