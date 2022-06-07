@@ -18,7 +18,7 @@ export class SnakeGameComponent implements OnInit, OnDestroy {
   @ViewChild('canvasSnake', { static: true }) canvas: ElementRef<HTMLCanvasElement>;
 
   ctx: CanvasRenderingContext2D;
-  canvasSize = 600;
+  canvasSize: number = 600;
   gridSize: number = 30;
   interval: any;
 
@@ -46,7 +46,7 @@ export class SnakeGameComponent implements OnInit, OnDestroy {
     }
   }
 
-  game() {
+  game(): void {
     const alive = this.snake.move(this.gridSize);
     if (alive) {
       if (this.apple.x == this.snake.head.x && this.apple.y == this.snake.head.y) {
@@ -63,7 +63,7 @@ export class SnakeGameComponent implements OnInit, OnDestroy {
     this.drawSnake();
   }
 
-  drawSnake() {
+  drawSnake(): void {
     this.ctx.fillStyle = "MediumSpringGreen";
     for (let i = 0; i < this.snake.trail.length; i++) {
       this.ctx.fillRect(
@@ -74,12 +74,12 @@ export class SnakeGameComponent implements OnInit, OnDestroy {
     }
   }
 
-  drawBackground() {
+  drawBackground(): void {
     this.ctx.fillStyle = "black";
     this.ctx.fillRect(0, 0, this.canvasSize, this.canvasSize);
   }
 
-  eatApple() {
+  eatApple(): void {
     this.snake.tail++;
     this.generateNewApple();
   }
@@ -87,14 +87,14 @@ export class SnakeGameComponent implements OnInit, OnDestroy {
   /**
    * Generates a new apple with random coordinates.
    */
-  generateNewApple() {
+  generateNewApple(): void {
     this.apple = {
       x: Math.floor(Math.random() * this.gridSize),
       y: Math.floor(Math.random() * this.gridSize)
     }
   }
 
-  private drawApple() {
+  private drawApple(): void {
     this.ctx.fillStyle = "OrangeRed";
     this.ctx.beginPath();
     this.ctx.arc(
@@ -107,7 +107,7 @@ export class SnakeGameComponent implements OnInit, OnDestroy {
     this.ctx.fill();
   }
 
-  keyPush(evt: any) {
+  keyPush(evt: any): void {
     this.snake.changeDirection(evt.keyCode);
   }
 }
