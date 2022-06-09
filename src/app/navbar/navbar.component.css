@@ -1,4 +1,5 @@
 .navbar {
+    position:fixed;
     display: flex;
     height: 48px;
 }
