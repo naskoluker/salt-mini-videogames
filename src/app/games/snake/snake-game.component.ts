@@ -1,11 +1,12 @@
 import { 
   Component,
-  ElementRef,
   OnDestroy,
   OnInit,
   ViewChild,
-  Renderer2 } from '@angular/core';
-import { BiDimensionalCoords } from '../model/general-2d-game.model';
+  Renderer2, 
+  ElementRef
+} from '@angular/core';
+import { Coords } from '../shared/interfaces/coords.interface';
 import { Snake } from './snake';
 
 @Component({
@@ -15,15 +16,15 @@ import { Snake } from './snake';
 })
 export class SnakeGameComponent implements OnInit, OnDestroy {
 
-  @ViewChild('canvasSnake', { static: true }) canvas: ElementRef<HTMLCanvasElement>;
+  @ViewChild('canvas', { static: true }) canvas: ElementRef<HTMLCanvasElement>;
 
   ctx: CanvasRenderingContext2D;
   canvasSize: number = 600;
   gridSize: number = 30;
-  interval: any;
+  interval: number;
 
   snake: Snake;
-  apple: BiDimensionalCoords;
+  apple: Coords;
   objectSize: number = this.canvasSize / this.gridSize;
 
   constructor(
@@ -35,21 +36,22 @@ export class SnakeGameComponent implements OnInit, OnDestroy {
     this.generateNewApple();
     this.ctx = this.canvas.nativeElement.getContext('2d');
     this.renderer.listen('document', 'keydown', (evt) => this.keyPush(evt));
-    this.interval = setInterval(() => {
+    this.interval = window.setInterval(() => {
       this.game();
     }, 1000/12);
   }
 
   ngOnDestroy(): void {
     if (this.interval) {
-      clearInterval(this.interval);
+      window.clearInterval(this.interval);
     }
   }
 
   game(): void {
-    const alive = this.snake.move(this.gridSize);
-    if (alive) {
-      if (this.apple.x == this.snake.head.x && this.apple.y == this.snake.head.y) {
+    const alive = this.snake.move();
+    const head = this.snake.getHead();
+    if (alive && this.snakeInGrid()) {
+      if (this.apple.x == head.x && this.apple.y == head.y) {
         this.eatApple();
       } else if (this.snake.tail < this.snake.trail.length) {
         this.snake.trail.shift();
@@ -109,5 +111,10 @@ export class SnakeGameComponent implements OnInit, OnDestroy {
 
   keyPush(evt: any): void {
     this.snake.changeDirection(evt.keyCode);
+  }
+
+  private snakeInGrid(): boolean {
+    const { x, y } = this.snake.getHead();
+    return x >= 0 && y >= 0 && x < this.gridSize && y < this.gridSize;
   }
 }

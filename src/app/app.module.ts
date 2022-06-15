@@ -10,7 +10,9 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { AppRoutingModule } from './app-routing.module';
 import { MatButtonModule } from '@angular/material/button';
-import { NavbarComponent } from './navbar/navbar.component';
+import { NavbarComponent } from './shared/navbar/navbar.component';
+
+import { SpaceInvadersGameComponent } from './games/space-invaders/space-invaders-game.component';
 
 @NgModule({
   declarations: [
@@ -18,6 +20,7 @@ import { NavbarComponent } from './navbar/navbar.component';
     HomeComponent,
     NavbarComponent,
     SnakeGameComponent,
+    SpaceInvadersGameComponent
   ],
   imports: [
     AppRoutingModule,
