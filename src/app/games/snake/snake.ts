@@ -1,13 +1,14 @@
-import { MovementKeycodes } from "../shared/enums/movement-keys.enum";
+import { Keycodes } from "../shared/enums/keycodes.enum";
 import { Coords } from "../shared/interfaces/coords.interface";
 import { MovementDirection } from "../shared/interfaces/movement.interface";
 
 export class Snake {
 
     private head: Coords;
-    tail: number;
-    trail: Array<Coords>;
-    movementDirection: MovementDirection;
+    private tail: number;
+    private trail: Array<Coords>;
+    private movementDirection: MovementDirection;
+    private lastMovementDirection: MovementDirection;
 
     constructor() {
         this.head = { x: 15, y: 15 };
@@ -21,13 +22,18 @@ export class Snake {
      * @returns true if the snake is alive or false if the snake is dead after the move
      */
     public move(): boolean {
-        this.moveSnake();
-        if (this.isMoving()) this.trail.push({ ...this.head });
+        if (this.isMoving()) {
+            this.moveSnake();
+            this.trail.push({ ...this.head });
+        }
+        if (this.tail < this.trail.length) {
+            this.trail.shift();
+        }
         return !(this.isMoving()) || !this.checkIfSnakeEatsItself();
     }
 
     private checkIfSnakeEatsItself(): boolean {
-        for (let i = 0; i < this.trail.length - 1; i++) {
+        for (let i = 0; i < this.trail.length - 4; i++) {
             if (this.trail[i].x == this.head.x && this.trail[i].y == this.head.y) {
                 return true;
             }
@@ -39,11 +45,24 @@ export class Snake {
         return this.movementDirection != MovementDirection.NONE;
     }
 
-    public getHead() {
+    public getHead(): Coords {
         return this.head;
     }
 
+    public getTrail(): Array<Coords> {
+        return this.trail;
+    }
+
+    public getTail(): number {
+        return this.tail;
+    }
+
+    public grow() {
+        this.tail++;
+    }
+
     private moveSnake(): void {
+        this.lastMovementDirection = this.movementDirection; 
         switch(this.movementDirection) {
             case MovementDirection.LEFT:
                 this.head.x--;
@@ -60,22 +79,26 @@ export class Snake {
         }
     }
 
-    public changeDirection(keyCode: number) {
+    /**
+     * Changes the direction of movement unless the snake has
+     * not moved since the previous time it changed directions
+     */
+    public changeDirection(keyCode: number): void {
         switch(keyCode) {
-            case MovementKeycodes.ARROW_LEFT:
-            case MovementKeycodes.A:
+            case Keycodes.ARROW_LEFT:
+            case Keycodes.A:
                 this.moveLeft();
                 break;
-            case MovementKeycodes.ARROW_UP:
-            case MovementKeycodes.W:
+            case Keycodes.ARROW_UP:
+            case Keycodes.W:
                 this.moveUp();
                 break;
-            case MovementKeycodes.ARROW_RIGHT:
-            case MovementKeycodes.D:
+            case Keycodes.ARROW_RIGHT:
+            case Keycodes.D:
                 this.moveRight();
                 break;
-            case MovementKeycodes.ARROW_DOWN:
-            case MovementKeycodes.S:
+            case Keycodes.ARROW_DOWN:
+            case Keycodes.S:
                 this.moveDown();
                 break;
         }
@@ -84,8 +107,8 @@ export class Snake {
     /**
      * Changes the movement direction of the snake to left unless it is currently moving right
      */
-    private moveLeft() {
-        if (this.movementDirection !== MovementDirection.RIGHT) {
+    private moveLeft(): void {
+        if (this.lastMovementDirection !== MovementDirection.RIGHT) {
             this.movementDirection = MovementDirection.LEFT;
         }
     }
@@ -93,8 +116,8 @@ export class Snake {
     /**
      * Changes the movement direction of the snake to up unless it is currently moving down
      */
-    private moveUp() {
-        if (this.movementDirection !== MovementDirection.DOWN) {
+    private moveUp(): void {
+        if (this.lastMovementDirection !== MovementDirection.DOWN) {
             this.movementDirection = MovementDirection.UP;
         }
     }
@@ -102,8 +125,8 @@ export class Snake {
     /**
      * Changes the movement direction of the snake to right unless it is currently moving left
      */
-    private moveRight() {
-        if (this.movementDirection !== MovementDirection.LEFT) {
+    private moveRight(): void {
+        if (this.lastMovementDirection !== MovementDirection.LEFT) {
             this.movementDirection = MovementDirection.RIGHT;
         }
     }
@@ -111,8 +134,8 @@ export class Snake {
     /**
      * Changes the movement direction of the snake to down unless it is currently moving up
      */
-    private moveDown() {
-        if (this.movementDirection !== MovementDirection.UP) {
+    private moveDown(): void {
+        if (this.lastMovementDirection !== MovementDirection.UP) {
             this.movementDirection = MovementDirection.DOWN;
         }
     }

@@ -18,27 +18,29 @@ export class SnakeGameComponent implements OnInit, OnDestroy {
 
   @ViewChild('canvas', { static: true }) canvas: ElementRef<HTMLCanvasElement>;
 
-  ctx: CanvasRenderingContext2D;
+  private ctx: CanvasRenderingContext2D;
   canvasSize: number = 600;
-  gridSize: number = 30;
-  interval: number;
+  private gridSize: number = 30;
+  private interval: number;
 
-  snake: Snake;
-  apple: Coords;
-  objectSize: number = this.canvasSize / this.gridSize;
+  private snake: Snake;
+  private apple: Coords;
+  private objectSize: number;
 
   constructor(
     private renderer: Renderer2
-  ) {}
+  ) {
+    this.objectSize = this.canvasSize / this.gridSize; 
+  }
 
   ngOnInit(): void {
     this.snake = new Snake();
     this.generateNewApple();
     this.ctx = this.canvas.nativeElement.getContext('2d');
-    this.renderer.listen('document', 'keydown', (evt) => this.keyPush(evt));
-    this.interval = window.setInterval(() => {
+    this.renderer.listen('document', 'keydown', (evt: KeyboardEvent): void => this.keyPush(evt));
+    this.interval = window.setInterval((): void => {
       this.game();
-    }, 1000/12);
+    }, 100);
   }
 
   ngOnDestroy(): void {
@@ -47,49 +49,54 @@ export class SnakeGameComponent implements OnInit, OnDestroy {
     }
   }
 
-  game(): void {
+  private game(): void {
+
     const alive = this.snake.move();
-    const head = this.snake.getHead();
+
     if (alive && this.snakeInGrid()) {
+
+      const head = this.snake.getHead();
+      const trail = this.snake.getTrail();
+      const tail = this.snake.getTail();
+
       if (this.apple.x == head.x && this.apple.y == head.y) {
         this.eatApple();
-      } else if (this.snake.tail < this.snake.trail.length) {
-        this.snake.trail.shift();
       }
+
+      this.drawBackground();
+      this.drawApple();
+      this.drawSnake(trail);
     } else {
       this.snake = new Snake();
       this.generateNewApple();
     }
-    this.drawBackground();
-    this.drawApple();
-    this.drawSnake();
   }
 
-  drawSnake(): void {
+  private drawSnake(trail: Array<Coords>): void {
     this.ctx.fillStyle = "MediumSpringGreen";
-    for (let i = 0; i < this.snake.trail.length; i++) {
+    for (let i = 0; i < trail.length; i++) {
       this.ctx.fillRect(
-        this.snake.trail[i].x * this.objectSize,
-        this.snake.trail[i].y * this.objectSize,
+        trail[i].x * this.objectSize,
+        trail[i].y * this.objectSize,
         this.objectSize - 1,
         this.objectSize - 1);
     }
   }
 
-  drawBackground(): void {
+  private drawBackground(): void {
     this.ctx.fillStyle = "black";
     this.ctx.fillRect(0, 0, this.canvasSize, this.canvasSize);
   }
 
-  eatApple(): void {
-    this.snake.tail++;
+  private eatApple(): void {
+    this.snake.grow();
     this.generateNewApple();
   }
 
   /**
    * Generates a new apple with random coordinates.
    */
-  generateNewApple(): void {
+  private generateNewApple(): void {
     this.apple = {
       x: Math.floor(Math.random() * this.gridSize),
       y: Math.floor(Math.random() * this.gridSize)
@@ -109,10 +116,14 @@ export class SnakeGameComponent implements OnInit, OnDestroy {
     this.ctx.fill();
   }
 
-  keyPush(evt: any): void {
+  private keyPush(evt: KeyboardEvent): void {
     this.snake.changeDirection(evt.keyCode);
   }
 
+  /**
+   * Checks if the snake is inside of the grid
+   * @returns true if it's in the grid, false if it's not
+   */
   private snakeInGrid(): boolean {
     const { x, y } = this.snake.getHead();
     return x >= 0 && y >= 0 && x < this.gridSize && y < this.gridSize;

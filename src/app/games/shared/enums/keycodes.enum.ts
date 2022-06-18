@@ -1,4 +1,4 @@
-export enum MovementKeycodes {
+export enum Keycodes {
     ARROW_LEFT  = 37,
     ARROW_UP    = 38,
     ARROW_RIGHT = 39,
@@ -7,4 +7,5 @@ export enum MovementKeycodes {
     W = 87,
     D = 68,
     S = 83,
+    SPACE = 32,
 }
