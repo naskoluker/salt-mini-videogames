@@ -9,11 +9,12 @@ export class Snake {
     private trail: Array<Coords>;
     private movementDirection: MovementDirection;
     private lastMovementDirection: MovementDirection;
+    private lastTailCoord: Coords;
 
-    constructor() {
-        this.head = { x: 15, y: 15 };
+    constructor(snakePosition: number) {
+        this.head = { x: snakePosition, y: snakePosition };
         this.tail = 5;
-        this.trail = [{ x: 15, y: 15 }];
+        this.trail = [{ x: snakePosition, y: snakePosition }];
         this.movementDirection = MovementDirection.NONE;
     }
 
@@ -27,21 +28,27 @@ export class Snake {
             this.trail.push({ ...this.head });
         }
         if (this.tail < this.trail.length) {
-            this.trail.shift();
+            this.lastTailCoord = this.trail.shift();
         }
         return !(this.isMoving()) || !this.checkIfSnakeEatsItself();
     }
 
     private checkIfSnakeEatsItself(): boolean {
-        for (let i = 0; i < this.trail.length - 4; i++) {
-            if (this.trail[i].x == this.head.x && this.trail[i].y == this.head.y) {
+        let distanceX: number;
+        let distanceY: number;
+        let longestDistance: number;
+        for (let i = 0; i < this.trail.length - 4; i += longestDistance) {
+            distanceX = Math.abs(this.head.x - this.trail[i].x);
+            distanceY = Math.abs(this.head.y - this.trail[i].y);
+            longestDistance = distanceX > distanceY ? distanceX : distanceY;
+            if (longestDistance === 0) {
                 return true;
             }
         }
         return false;
     }
 
-    private isMoving() {
+    private isMoving(): boolean {
         return this.movementDirection != MovementDirection.NONE;
     }
 
@@ -57,8 +64,12 @@ export class Snake {
         return this.tail;
     }
 
-    public grow() {
+    public grow(): void {
         this.tail++;
+    }
+
+    public getLastTailCoord(): Coords {
+        return this.lastTailCoord;
     }
 
     private moveSnake(): void {
